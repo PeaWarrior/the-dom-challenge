@@ -7,61 +7,51 @@ const pauseButton = document.querySelector('button#pause');
 const commentsDiv = document.querySelector('div#list.comments');
 const commentsForm = document.querySelector('form#comment-form')
 
-let startCounter = true;
-let counter = 0;
+let likesObj = {}
 
-setInterval(() => {
-    if (startCounter) {
-        counter += 1
-        counterH1.innerText = counter;
-    }
-}, 1000);
+let counter = setInterval(() => counterH1.innerText = parseInt(counterH1.innerText) + 1, 1000);
 
-pauseButton.addEventListener('click', (e) => {
-    if (startCounter) {
-        startCounter = false;
-        pauseButton.innerText = 'resume'
+pauseButton.addEventListener('click', function(e) {
+    if (this.innerText === 'pause') {
+        this.innerText = 'resume'
+        clearInterval(counter)
+        disableButtons(true)
     } else {
-        startCounter = true;
-        pauseButton.innerText = 'pause'
+        this.innerText = 'pause'
+        counter = setInterval(() => counterH1.innerText = parseInt(counterH1.innerText) + 1, 1000);
+        disableButtons(false)
     }
 });
 
+function disableButtons(boolean) {
+    let allBtns = document.querySelectorAll('button')
+
+    allBtns.forEach((btn) => {
+        if (btn.id !== 'pause') {
+            btn.disabled = boolean
+        }
+    });
+};
+
 increaseButton.addEventListener('click', (e) => {
-    if (startCounter) {
-        counter += 1
-        counterH1.innerText = counter;
-    }
+    counterH1.innerText = parseInt(counterH1.innerText) + 1
 });
 
 decreaseButton.addEventListener('click', (e) => {
-    if (startCounter) {
-        counter -= 1
-        counterH1.innerText = counter;
-    }
+        counterH1.innerText = parseInt(counterH1.innerText) - 1
 });
 
 likeButton.addEventListener('click', (e) => {
-    let likeLis = document.querySelectorAll('li')
-    let lastLi = likeLis[likeLis.length -1]
+    let currentNumber = parseInt(counterH1.innerText)
+    likesObj[currentNumber] ? likesObj[currentNumber] += 1 : likesObj[currentNumber] = 1
+    
+    likesUl.innerText = ""
 
-    let found = false
-    likeLis.forEach((likeLi) => {
-        if (likeLi.innerText.includes(`Number: ${counterH1.innerText}`)) {
-            let likeSpan = likeLi.querySelector('span');
-            likeSpan.innerText = parseInt(likeSpan.innerText) + 1;
-            found = true;
-        }
-    });
-    if (!found) {
-        let likeLi = document.createElement('li');
-            likeLi.innerText = `Number: ${counter} Likes: `;
-        
-        let likeSpan = document.createElement('span');
-            likeSpan.innerText = 1;
-        
-        likeLi.append(likeSpan);
-        likesUl.append(likeLi);
+    for (const keyNum in likesObj) {
+        let likesLi = document.createElement('li')
+            likesLi.innerText = `Number: ${keyNum} Likes: ${likesObj[keyNum]}`
+
+        likesUl.append(likesLi)
     }
 });
 
